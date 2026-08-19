@@ -1,0 +1,306 @@
+{
+  "note": "Demonstration study.",
+  "prior_art": "Prior art (grader self-inconsistency is established, not discovered here): Rating Roulette (arXiv 2510.27106); Reliability without Validity (arXiv 2606.19544). Stopping-rule form follows Miller, Adding Error Bars to Evals (arXiv 2411.00640), which adds the question and model-sampling terms and assumes the grader term is zero. Statistics: rater-agreement (DOI 10.5281/zenodo.21983269).",
+  "config": {
+    "model": "anthropic/claude-sonnet-5",
+    "model_alias": "anthropic/claude-sonnet-5",
+    "model_resolved": "anthropic/claude-sonnet-5",
+    "graders_resolved": [
+      "anthropic/claude-haiku-4-5-20251001",
+      "openai/gpt-4.1-mini-2025-04-14"
+    ],
+    "dataset_revision": "inspect_ai-0.3.259/theory_of_mind.jsonl@sha256:d67dcc9d8f95a9e22453016f28fb99fba8cf17b1d32f6f4dee739c5b6e7fd61c",
+    "manifest_file": "demo_results.manifest.json",
+    "k": 12,
+    "limit": 50,
+    "model_epochs": 3,
+    "grader_temperature": 1.0
+  },
+  "results": [
+    {
+      "grader": "anthropic/claude-haiku-4-5-20251001",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 150,
+        "n_repeats": 12
+      },
+      "metrics": {
+        "accuracy": 0.8733333333333333,
+        "stderr": 0.04556523319583118
+      },
+      "decomposition": {
+        "question": 0.09936507936507938,
+        "model": 0.013333333333333334,
+        "grader": 0.0,
+        "total": 0.11269841269841271,
+        "grader_share": 0.0,
+        "model_share": 0.11830985915492957,
+        "question_share": 0.8816901408450705
+      },
+      "decomposition_reml": {
+        "question": 0.0030937952287078637,
+        "model": 0.0025943588955001638,
+        "grader": 6.149141550798949e-13,
+        "total": 0.005688154124822942,
+        "grader_share": 1.0810434133569397e-10,
+        "model_share": 0.4560985582613621,
+        "question_share": 0.5439014416305336
+      },
+      "recommended_k": 1,
+      "grader_variance": 0.0,
+      "item_variance": 0.09936507936507938,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 2,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 3,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 4,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 5,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 6,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 7,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 8,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 9,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 10,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 11,
+          "score_se": 0.04556523319583119
+        },
+        {
+          "k": 12,
+          "score_se": 0.04556523319583119
+        }
+      ],
+      "stopping_rule": "Grader repeats stop helping once the grader variance term is negligible relative to the between-item variance the item sample fixes: sigma2_grader / (m*k) <= 0.05 * sigma2_between. Here sigma2_grader = 0 and sigma2_between = 0.099365, giving a recommended k = 1. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples; Miller assumes the grader term is zero, so it does not appear in his stopping condition.",
+      "dependability_target": 0.9,
+      "repeats_needed_for_target": 1,
+      "dependability_curve": [
+        {
+          "k": 1,
+          "phi": 1.0
+        },
+        {
+          "k": 2,
+          "phi": 1.0
+        },
+        {
+          "k": 3,
+          "phi": 1.0
+        },
+        {
+          "k": 4,
+          "phi": 1.0
+        },
+        {
+          "k": 5,
+          "phi": 1.0
+        },
+        {
+          "k": 6,
+          "phi": 1.0
+        },
+        {
+          "k": 7,
+          "phi": 1.0
+        },
+        {
+          "k": 8,
+          "phi": 1.0
+        },
+        {
+          "k": 9,
+          "phi": 1.0
+        },
+        {
+          "k": 10,
+          "phi": 1.0
+        },
+        {
+          "k": 11,
+          "phi": 1.0
+        },
+        {
+          "k": 12,
+          "phi": 1.0
+        }
+      ]
+    },
+    {
+      "grader": "openai/gpt-4.1-mini-2025-04-14",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 150,
+        "n_repeats": 12
+      },
+      "metrics": {
+        "accuracy": 0.9122222222222223,
+        "stderr": 0.03280342207566191
+      },
+      "decomposition": {
+        "question": 0.05077853363567649,
+        "model": 0.007138047138047139,
+        "grader": 0.023232323232323233,
+        "total": 0.08114890400604687,
+        "grader_share": 0.2862925077902723,
+        "model_share": 0.08796233572686628,
+        "question_share": 0.6257451564828613
+      },
+      "decomposition_reml": {
+        "question": 0.050777079459069195,
+        "model": 0.0071380140152290964,
+        "grader": 0.023232346847531237,
+        "total": 0.08114744032182952,
+        "grader_share": 0.28629796276249875,
+        "model_share": 0.0879635141530015,
+        "question_share": 0.6257385230844998
+      },
+      "recommended_k": 4,
+      "grader_variance": 0.023232323232323233,
+      "item_variance": 0.05077853363567649,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.03490042705349032
+        },
+        {
+          "k": 2,
+          "score_se": 0.0337727513104118
+        },
+        {
+          "k": 3,
+          "score_se": 0.03338839676586108
+        },
+        {
+          "k": 4,
+          "score_se": 0.033194550642453094
+        },
+        {
+          "k": 5,
+          "score_se": 0.0330776976921048
+        },
+        {
+          "k": 6,
+          "score_se": 0.032999565847359316
+        },
+        {
+          "k": 7,
+          "score_se": 0.03294364393566483
+        },
+        {
+          "k": 8,
+          "score_se": 0.03290164012620212
+        },
+        {
+          "k": 9,
+          "score_se": 0.03286893338631608
+        },
+        {
+          "k": 10,
+          "score_se": 0.03284274454308074
+        },
+        {
+          "k": 11,
+          "score_se": 0.032821301764741476
+        },
+        {
+          "k": 12,
+          "score_se": 0.03280342207566192
+        }
+      ],
+      "stopping_rule": "Grader repeats stop helping once the grader variance term is negligible relative to the between-item variance the item sample fixes: sigma2_grader / (m*k) <= 0.05 * sigma2_between. Here sigma2_grader = 0.023232 and sigma2_between = 0.050779, giving a recommended k = 4. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples; Miller assumes the grader term is zero, so it does not appear in his stopping condition.",
+      "dependability_target": 0.9,
+      "repeats_needed_for_target": 4,
+      "dependability_curve": [
+        {
+          "k": 1,
+          "phi": 0.7137074922097276
+        },
+        {
+          "k": 2,
+          "phi": 0.8329396883122017
+        },
+        {
+          "k": 3,
+          "phi": 0.8820586880991251
+        },
+        {
+          "k": 4,
+          "phi": 0.9088566237323226
+        },
+        {
+          "k": 5,
+          "phi": 0.9257314822950532
+        },
+        {
+          "k": 6,
+          "phi": 0.9373338819630564
+        },
+        {
+          "k": 7,
+          "phi": 0.9458009784999327
+        },
+        {
+          "k": 8,
+          "phi": 0.9522523718468348
+        },
+        {
+          "k": 9,
+          "phi": 0.9573312939181002
+        },
+        {
+          "k": 10,
+          "phi": 0.9614336067163243
+        },
+        {
+          "k": 11,
+          "phi": 0.9648162871140822
+        },
+        {
+          "k": 12,
+          "phi": 0.9676534238004213
+        }
+      ]
+    }
+  ],
+  "judge_comparison": {
+    "judge_a": "anthropic/claude-haiku-4-5-20251001",
+    "judge_b": "openai/gpt-4.1-mini-2025-04-14",
+    "diagnostics": {
+      "percent_agreement": 0.96,
+      "kappa": 0.811320754716981,
+      "prevalence_index": 0.76,
+      "bias_index": 0.04,
+      "pabak": 0.9199999999999999,
+      "paradox": false,
+      "note": "raw agreement 96% and kappa 0.81 are consistent (prevalence index 0.76, bias index 0.04)."
+    }
+  }
+}
