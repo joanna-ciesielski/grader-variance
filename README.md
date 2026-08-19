@@ -209,6 +209,10 @@ MIT — see [`LICENSE`](LICENSE).
 
 ## Figures
 
-![Variance decomposition](docs/figures/demo_results_3way_variance.png)
+Variance components and the grader-repeat dependability curve from the
+definitive study recorded in [`docs/RESULTS.md`](docs/RESULTS.md) (50 questions
+x 3 model samples x 12 grader repeats, two judges). Figures from the earlier
+k = 6 demonstration have been removed: that run is superseded in its entirety
+and no number from it is reported anywhere.
 
-![k-selection curve](docs/figures/demo_results_3way_kcurve.png)
+![Variance components and dependability curve](docs/figures/fig1_components_dependability.png)

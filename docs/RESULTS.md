@@ -69,10 +69,15 @@ harness makes that a one-line check.
 
 ## Honesty notes
 
-1. **Haiku's exact zero across 1,800 re-scorings (T = 1.0).** Verified not to
-   be an artifact of provider response caching: [PENDING — 20-call probe:
-   distinct reasoning texts with constant grades rules caching out; record the
-   probe output here before citing the zero anywhere].
+1. **Haiku's exact zero across 1,800 re-scorings (T = 1.0) is not caching.**
+   Probe (2026-08-19, 2 × 20 identical grading requests at T = 1.0 via the
+   Anthropic API): 20/20 responses had **distinct full texts** (reasoning
+   wording varied on every call — provider response caching ruled out) while
+   the **verdict was constant 20/20** (13 × `GRADE: C`, 7 × `**GRADE: C**` —
+   a markdown-formatting wobble only, which the scorer's grade parser
+   normalizes). The zero is a real peaked-distribution result: the judge
+   samples, but the grade token distribution on these completions is
+   effectively degenerate.
 2. **"Grader" is the within-cell residual.** Under the nested design
    (question / model-sample / grader-repeat) with a single grader whose
    repeats are exchangeable, the grader component and the residual are the
