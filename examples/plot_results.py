@@ -78,17 +78,34 @@ def plot_kcurve(data: dict[str, Any], out_base: Path) -> list[Path]:
         color = SERIES[i % len(SERIES)]
         ks = [p["k"] for p in r["k_curve"]]
         ses = [p["score_se"] for p in r["k_curve"]]
-        ax.plot(ks, ses, "-o", color=color, linewidth=2, markersize=6, label=_short(r["grader"]))
+        ax.plot(
+            ks,
+            ses,
+            "-o",
+            color=color,
+            linewidth=2,
+            markersize=6,
+            label=_short(r["grader"]),
+        )
         rec_k = r.get("recommended_k")
         if isinstance(rec_k, int) and rec_k <= ks[-1]:
             se_at = next((p["score_se"] for p in r["k_curve"] if p["k"] == rec_k), None)
             if se_at is not None:
                 ax.plot([rec_k], [se_at], marker="D", color=color, markersize=8)
-                ax.annotate(f"k*={rec_k}", xy=(rec_k, se_at), xytext=(0, 10),
-                            textcoords="offset points", color=color, fontsize=8, ha="center")
+                ax.annotate(
+                    f"k*={rec_k}",
+                    xy=(rec_k, se_at),
+                    xytext=(0, 10),
+                    textcoords="offset points",
+                    color=color,
+                    fontsize=8,
+                    ha="center",
+                )
     ax.set_xlabel("grader repeats k")
     ax.set_ylabel("std. error of benchmark score")
-    ax.set_title("CI on the benchmark score vs. grader repeats", color=INK, fontsize=12, pad=12)
+    ax.set_title(
+        "CI on the benchmark score vs. grader repeats", color=INK, fontsize=12, pad=12
+    )
     ax.set_ylim(bottom=0)
     ax.margins(x=0.08)
     ax.grid(True, axis="y")
@@ -111,11 +128,26 @@ def plot_variance(data: dict[str, Any], out_base: Path) -> list[Path]:
         total = dec["question"] + dec["model"] + dec["grader"]
         for comp in components:
             share = (dec[comp] / total) if total > 0 else 0.0
-            ax.barh(row, share, left=left, color=COMPONENT_COLORS[comp],
-                    edgecolor=SURFACE, linewidth=2, height=0.6)
+            ax.barh(
+                row,
+                share,
+                left=left,
+                color=COMPONENT_COLORS[comp],
+                edgecolor=SURFACE,
+                linewidth=2,
+                height=0.6,
+            )
             if share >= 0.06:
-                ax.text(left + share / 2, row, f"{share:.0%}", ha="center", va="center",
-                        color="#ffffff", fontsize=9, fontweight="bold")
+                ax.text(
+                    left + share / 2,
+                    row,
+                    f"{share:.0%}",
+                    ha="center",
+                    va="center",
+                    color="#ffffff",
+                    fontsize=9,
+                    fontweight="bold",
+                )
             left += share
     ax.set_yticks(y)
     ax.set_yticklabels(labels, color=INK)
@@ -126,17 +158,30 @@ def plot_variance(data: dict[str, Any], out_base: Path) -> list[Path]:
     for spine in ("top", "right", "left"):
         ax.spines[spine].set_visible(False)
     ax.tick_params(axis="y", length=0)
-    handles = [plt.Rectangle((0, 0), 1, 1, color=COMPONENT_COLORS[c]) for c in components]
-    ax.legend(handles, components, frameon=False, ncol=3, loc="upper center",
-              bbox_to_anchor=(0.5, -0.18), fontsize=9)
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, color=COMPONENT_COLORS[c]) for c in components
+    ]
+    ax.legend(
+        handles,
+        components,
+        frameon=False,
+        ncol=3,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.18),
+        fontsize=9,
+    )
     return _save(fig, out_base)
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("results", type=Path, help="a demo_study.py results JSON")
-    ap.add_argument("--out-dir", type=Path, default=None,
-                    help="directory for the figures (default: alongside the input)")
+    ap.add_argument(
+        "--out-dir",
+        type=Path,
+        default=None,
+        help="directory for the figures (default: alongside the input)",
+    )
     args = ap.parse_args()
     data = json.loads(args.results.read_text())
     out_dir = args.out_dir or args.results.parent
