@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "grader-variance"
+version = "0.1.0"
+description = "Inspect extension: isolate and decompose LLM-grader (judge) variance in a benchmark score, and give a stopping rule for how many grader repeats are needed."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Joanna Ciesielski" }]
+keywords = [
+    "inspect",
+    "inspect-ai",
+    "llm-as-judge",
+    "evaluation",
+    "grader-variance",
+    "reliability",
+    "variance-decomposition",
+    "intra-rater-reliability",
+]
+dependencies = [
+    "inspect-ai>=0.3.100",
+    "numpy>=1.24",
+    "rater-agreement @ git+https://github.com/joanna-ciesielski/rater-agreement.git",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "ruff>=0.5", "mypy>=1.8"]
+demo = ["anthropic", "openai", "matplotlib>=3.7"]
+
+[project.urls]
+Homepage = "https://github.com/joanna-ciesielski/grader-variance"
+"rater-agreement (DOI)" = "https://doi.org/10.5281/zenodo.21983269"
+
+# Register the metrics/scorers with Inspect's extension registry so
+# `inspect_ai` discovers them without an explicit import.
+[project.entry-points.inspect_ai]
+grader_variance = "grader_variance._registry"
+
+[tool.setuptools]
+packages = ["grader_variance"]
+package-dir = { "" = "src" }
+
+[tool.setuptools.package-data]
+grader_variance = ["py.typed"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+src = ["src", "tests"]
+# Do not format/lint Python snippets embedded in Markdown: newer ruff versions
+# reformat fenced code in README.md, which would make `ruff format --check`
+# pass or fail depending on the ruff version rather than on our source.
+extend-exclude = ["*.md"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]
+
+# Strict typing gates the shipped package (src). Tests call Inspect metrics
+# directly, exercising Inspect's own loosely-typed Metric/Value surface, so they
+# are type-checked non-strictly (see the tests override below); correctness of
+# the tests is gated by pytest, not the type checker.
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src"]
+
+# rater-agreement ships no type stubs (numpy-only runtime lib); allow it untyped
+# without weakening strictness for our own code.
+[[tool.mypy.overrides]]
+module = ["raters.*"]
+ignore_missing_imports = true

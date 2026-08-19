@@ -1,0 +1,162 @@
+{
+  "note": "MOCK mechanism check \u2014 not a scientific result.",
+  "prior_art": "Prior art (grader self-inconsistency is established, not discovered here): Rating Roulette (arXiv 2510.27106); Reliability without Validity (arXiv 2606.19544). Stopping-rule form follows Miller, Adding Error Bars to Evals (arXiv 2411.00640), which adds the question and model-sampling terms and assumes the grader term is zero. Statistics: rater-agreement (DOI 10.5281/zenodo.21983269).",
+  "config": {
+    "model": "model",
+    "k": 10,
+    "limit": 20,
+    "model_epochs": 1,
+    "grader_temperature": null
+  },
+  "results": [
+    {
+      "grader": "mock-judge-A (p=0.80)",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 20,
+        "n_repeats": 10
+      },
+      "metrics": {
+        "flip_rate": 0.8,
+        "test_retest": 0.72,
+        "grader_variance_share": 0.9412597310686482
+      },
+      "decomposition": {
+        "question": 0.008736842105263163,
+        "model": 0.0,
+        "grader": 0.14,
+        "total": 0.14873684210526317,
+        "grader_share": 0.9412597310686482,
+        "model_share": 0.0,
+        "question_share": 0.058740268931351765
+      },
+      "recommended_k": 321,
+      "grader_variance": 0.14,
+      "item_variance": 0.008736842105263163,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.08623712718581922
+        },
+        {
+          "k": 2,
+          "score_se": 0.06274425954032097
+        },
+        {
+          "k": 3,
+          "score_se": 0.052632456133041065
+        },
+        {
+          "k": 4,
+          "score_se": 0.046763683615206775
+        },
+        {
+          "k": 5,
+          "score_se": 0.04285839597165483
+        },
+        {
+          "k": 6,
+          "score_se": 0.04004383562959254
+        },
+        {
+          "k": 7,
+          "score_se": 0.03790570016848598
+        },
+        {
+          "k": 8,
+          "score_se": 0.036219360917376195
+        },
+        {
+          "k": 9,
+          "score_se": 0.034851397146182475
+        },
+        {
+          "k": 10,
+          "score_se": 0.03371708921694099
+        }
+      ],
+      "stopping_rule": "Grader repeats stop helping once the grader variance term is negligible relative to the between-item variance the item sample fixes: sigma2_grader / (m*k) <= 0.05 * sigma2_between. Here sigma2_grader = 0.14 and sigma2_between = 0.0087368, giving a recommended k = 321. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples; Miller assumes the grader term is zero, so it does not appear in his stopping condition."
+    },
+    {
+      "grader": "mock-judge-B (p=0.55)",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 20,
+        "n_repeats": 10
+      },
+      "metrics": {
+        "flip_rate": 1.0,
+        "test_retest": 0.5044444444444445,
+        "grader_variance_share": 1.0
+      },
+      "decomposition": {
+        "question": 0.0,
+        "model": 0.0,
+        "grader": 0.24777777777777774,
+        "total": 0.24777777777777774,
+        "grader_share": 1.0,
+        "model_share": 0.0,
+        "question_share": 0.0
+      },
+      "recommended_k": null,
+      "grader_variance": 0.24777777777777774,
+      "item_variance": 0.0,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.11130538571375999
+        },
+        {
+          "k": 2,
+          "score_se": 0.07870479302078395
+        },
+        {
+          "k": 3,
+          "score_se": 0.06426219440409446
+        },
+        {
+          "k": 4,
+          "score_se": 0.055652692856879994
+        },
+        {
+          "k": 5,
+          "score_se": 0.04977728174356026
+        },
+        {
+          "k": 6,
+          "score_se": 0.045440233437063396
+        },
+        {
+          "k": 7,
+          "score_se": 0.042069481454390066
+        },
+        {
+          "k": 8,
+          "score_se": 0.039352396510391977
+        },
+        {
+          "k": 9,
+          "score_se": 0.037101795237919996
+        },
+        {
+          "k": 10,
+          "score_se": 0.03519785346990479
+        }
+      ],
+      "stopping_rule": "The between-item (question) variance is estimated at zero, so no finite number of grader repeats makes the grader term negligible relative to it: the benchmark cannot distinguish items beyond grader noise (sigma2_grader = 0.24778). That is itself the finding. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples, which assumes the grader term is zero."
+    }
+  ],
+  "judge_comparison": {
+    "judge_a": "mock-judge-A (p=0.80)",
+    "judge_b": "mock-judge-B (p=0.55)",
+    "diagnostics": {
+      "percent_agreement": 0.7,
+      "kappa": 0.0,
+      "prevalence_index": 0.7,
+      "bias_index": 0.3,
+      "pabak": 0.3999999999999999,
+      "paradox": true,
+      "note": "raw agreement 70% but kappa only 0.00 \u2014 prevalence index 0.70 means chance agreement is inflated by skewed categories. PABAK 0.40 shows what kappa would be with balanced marginals; report both, not the raw percentage alone."
+    }
+  }
+}

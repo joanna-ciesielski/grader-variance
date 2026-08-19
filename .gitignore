@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+logs/
+*.eval
+demo_results*.json
+!examples/demo_results_mock.json
+.venv/
+venv/

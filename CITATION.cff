@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+type: software
+title: "grader-variance: an Inspect-native measurement of how much of a benchmark score is the grader"
+version: 0.1.0
+authors:
+  - family-names: Ciesielski
+    given-names: Joanna
+    orcid: "https://orcid.org/0009-0001-2397-3660"
+repository-code: "https://github.com/joanna-ciesielski/grader-variance"
+license: MIT
+abstract: >-
+  An extension for the Inspect evaluation framework that isolates LLM-grader
+  (judge) variance from model-sampling variance, decomposes the spread in a
+  benchmark's score into question, model-sampling, and grader components, and
+  provides a stopping rule for how many grader repeats are needed. Grader
+  self-inconsistency is established prior art (Rating Roulette, arXiv 2510.27106;
+  Reliability without Validity, arXiv 2606.19544); the contribution here is the
+  variance decomposition of the grader term and its repeat-count stopping rule,
+  stated in the form of Miller's "Adding Error Bars to Evals" (arXiv 2411.00640),
+  delivered as a native Inspect extension. Statistics are computed by the
+  rater-agreement library (DOI 10.5281/zenodo.21983269).
+keywords:
+  - inspect
+  - llm-as-judge
+  - evaluation
+  - grader-variance
+  - variance-decomposition
+  - intra-rater-reliability
+references:
+  - type: software
+    title: "rater-agreement"
+    authors:
+      - family-names: Ciesielski
+        given-names: Joanna
+    doi: 10.5281/zenodo.21983269
+  - type: article
+    title: "Rating Roulette: Self-Inconsistency in LLM-As-A-Judge Frameworks"
+    year: 2025
+    notes: "arXiv:2510.27106 (EMNLP 2025 Findings)"
+  - type: article
+    title: "Reliability without Validity: A Systematic, Large-Scale Evaluation of LLM-as-a-Judge Models"
+    notes: "arXiv:2606.19544"
+  - type: article
+    title: "Adding Error Bars to Evals"
+    authors:
+      - family-names: Miller
+        given-names: Evan
+    year: 2024
+    notes: "arXiv:2411.00640"

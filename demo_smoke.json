@@ -1,0 +1,122 @@
+{
+  "note": "Demonstration study.",
+  "prior_art": "Prior art (grader self-inconsistency is established, not discovered here): Rating Roulette (arXiv 2510.27106); Reliability without Validity (arXiv 2606.19544). Stopping-rule form follows Miller, Adding Error Bars to Evals (arXiv 2411.00640), which adds the question and model-sampling terms and assumes the grader term is zero. Statistics: rater-agreement (DOI 10.5281/zenodo.21983269).",
+  "config": {
+    "model": "anthropic/claude-sonnet-5",
+    "k": 5,
+    "limit": 10,
+    "model_epochs": 1,
+    "grader_temperature": 1.0
+  },
+  "results": [
+    {
+      "grader": "anthropic/claude-haiku-4-5-20251001",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 10,
+        "n_repeats": 5
+      },
+      "metrics": {
+        "flip_rate": 0.0,
+        "test_retest": 1.0,
+        "grader_variance_share": NaN
+      },
+      "decomposition": {
+        "question": 0.0,
+        "model": 0.0,
+        "grader": 0.0,
+        "total": 0.0,
+        "grader_share": NaN,
+        "model_share": NaN,
+        "question_share": NaN
+      },
+      "recommended_k": 1,
+      "grader_variance": 0.0,
+      "item_variance": 0.0,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.0
+        },
+        {
+          "k": 2,
+          "score_se": 0.0
+        },
+        {
+          "k": 3,
+          "score_se": 0.0
+        },
+        {
+          "k": 4,
+          "score_se": 0.0
+        },
+        {
+          "k": 5,
+          "score_se": 0.0
+        }
+      ],
+      "stopping_rule": "Grader repeats stop helping once the grader variance term is negligible relative to the between-item variance the item sample fixes: sigma2_grader / (m*k) <= 0.05 * sigma2_between. Here sigma2_grader = 0 and sigma2_between = 0, giving a recommended k = 1. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples; Miller assumes the grader term is zero, so it does not appear in his stopping condition."
+    },
+    {
+      "grader": "openai/gpt-4.1-mini",
+      "frozen_check": {
+        "ok": true,
+        "n_items": 10,
+        "n_repeats": 5
+      },
+      "metrics": {
+        "flip_rate": 0.0,
+        "test_retest": 1.0,
+        "grader_variance_share": NaN
+      },
+      "decomposition": {
+        "question": 0.0,
+        "model": 0.0,
+        "grader": 0.0,
+        "total": 0.0,
+        "grader_share": NaN,
+        "model_share": NaN,
+        "question_share": NaN
+      },
+      "recommended_k": 1,
+      "grader_variance": 0.0,
+      "item_variance": 0.0,
+      "k_curve": [
+        {
+          "k": 1,
+          "score_se": 0.0
+        },
+        {
+          "k": 2,
+          "score_se": 0.0
+        },
+        {
+          "k": 3,
+          "score_se": 0.0
+        },
+        {
+          "k": 4,
+          "score_se": 0.0
+        },
+        {
+          "k": 5,
+          "score_se": 0.0
+        }
+      ],
+      "stopping_rule": "Grader repeats stop helping once the grader variance term is negligible relative to the between-item variance the item sample fixes: sigma2_grader / (m*k) <= 0.05 * sigma2_between. Here sigma2_grader = 0 and sigma2_between = 0, giving a recommended k = 1. This is the grader analogue of Miller's (arXiv 2411.00640) rule for model resamples; Miller assumes the grader term is zero, so it does not appear in his stopping condition."
+    }
+  ],
+  "judge_comparison": {
+    "judge_a": "anthropic/claude-haiku-4-5-20251001",
+    "judge_b": "openai/gpt-4.1-mini",
+    "diagnostics": {
+      "percent_agreement": 1.0,
+      "kappa": null,
+      "prevalence_index": 1.0,
+      "bias_index": 0.0,
+      "pabak": 1.0,
+      "paradox": true,
+      "note": "kappa is undefined: every rating fell in a single category (prevalence index 1.00). Raw agreement of 100% carries no information about reliability here."
+    }
+  }
+}
