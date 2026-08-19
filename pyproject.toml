@@ -67,7 +67,6 @@ select = ["E", "F", "I", "UP", "B", "W"]
 # are type-checked non-strictly (see the tests override below); correctness of
 # the tests is gated by pytest, not the type checker.
 [tool.mypy]
-python_version = "3.10"
 strict = true
 files = ["src"]
 
