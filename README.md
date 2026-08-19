@@ -20,9 +20,11 @@ art**, not a finding of this project:
   21 models, ~541,000 judgments; test-retest reliability, self-consistency, flip
   rate.
 
-An earlier independent replication measured a decision flip rate of 0.38, which is
-consistent with this literature and is presented here as **replication, never as a
-discovery**.
+(Provenance note: a 0.38 decision flip rate that circulated in earlier project
+notes came from a **seeded synthetic worked example** in the rater-agreement
+library — no model calls — and is **not** a measurement. It serves only as a
+reference-value fixture for unit tests. The measurements in this repository come
+exclusively from the demonstration study recorded in the run manifest.)
 
 What those papers explicitly decline to do — and what this project adds — is:
 

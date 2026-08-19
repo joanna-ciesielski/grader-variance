@@ -80,8 +80,10 @@ degenerate sampling configuration — which is why the two points above matter.
 
 That LLM judges are self-inconsistent across repeated runs is established prior
 art (Rating Roulette, arXiv 2510.27106; Reliability without Validity,
-arXiv 2606.19544), independently replicated here (a measured decision flip rate
-of 0.38 in earlier work) and never presented as a discovery. Miller ("Adding
+arXiv 2606.19544) and is never presented as a discovery here. (A 0.38 decision
+flip rate cited in earlier project notes was traced to a seeded synthetic
+worked example in the rater-agreement library — no model calls — and is not a
+measurement; it is excluded from all claims.) Miller ("Adding
 Error Bars to Evals", arXiv 2411.00640) decomposes the question and
 model-sampling variance components and assumes scores are already computed. The
 only new element is the grader variance term and its stopping rule; the validity

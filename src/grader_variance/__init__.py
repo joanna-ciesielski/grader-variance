@@ -28,6 +28,7 @@ from .decomposition import (
     k_selection_curve,
     stopping_rule_text,
 )
+from .dstudy import dependability, estimate_components_reml, repeats_needed
 from .harness import (
     FrozenCheck,
     completion_digest,
@@ -35,10 +36,21 @@ from .harness import (
     regrade_frozen,
     verify_frozen,
 )
+from .manifest import (
+    CANARY,
+    RunManifest,
+    dataset_revision_for_bundled_example,
+    frozen_digests,
+    resolve_model_id,
+    verify_manifest_digests,
+    write_run_manifest,
+)
 from .metrics import (
     flip_rate,
     grader_variance_share,
     icc_1_1,
+    icc_2_1,
+    krippendorff_alpha_repeats,
     pabak,
     prevalence_index,
     test_retest,
@@ -50,6 +62,8 @@ __all__ = [
     # metrics (intra-grader)
     "flip_rate",
     "icc_1_1",
+    "icc_2_1",
+    "krippendorff_alpha_repeats",
     "test_retest",
     "pabak",
     "prevalence_index",
@@ -69,4 +83,16 @@ __all__ = [
     "VarianceComponents",
     "KSelectionCurve",
     "KSelectionPoint",
+    # D-study
+    "dependability",
+    "repeats_needed",
+    "estimate_components_reml",
+    # manifest / provenance
+    "CANARY",
+    "RunManifest",
+    "dataset_revision_for_bundled_example",
+    "frozen_digests",
+    "resolve_model_id",
+    "verify_manifest_digests",
+    "write_run_manifest",
 ]

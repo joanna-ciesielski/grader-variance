@@ -12,6 +12,8 @@ from .metrics import (
     flip_rate,
     grader_variance_share,
     icc_1_1,
+    icc_2_1,
+    krippendorff_alpha_repeats,
     pabak,
     prevalence_index,
     test_retest,
@@ -20,6 +22,8 @@ from .metrics import (
 __all__ = [
     "flip_rate",
     "icc_1_1",
+    "icc_2_1",
+    "krippendorff_alpha_repeats",
     "test_retest",
     "pabak",
     "prevalence_index",

@@ -27,6 +27,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+import numpy as np
 from inspect_ai.scorer import (
     Metric,
     SampleScore,
@@ -35,6 +36,8 @@ from inspect_ai.scorer import (
     value_to_float,
 )
 from raters import intra
+from raters.alpha import krippendorff_alpha as _krippendorff_alpha
+from raters.icc import icc as _icc
 
 from ._reshape import label_matrix, numeric_matrix
 from .decomposition import decompose
@@ -42,6 +45,8 @@ from .decomposition import decompose
 __all__ = [
     "flip_rate",
     "icc_1_1",
+    "icc_2_1",
+    "krippendorff_alpha_repeats",
     "test_retest",
     "pabak",
     "prevalence_index",
@@ -98,6 +103,71 @@ def icc_1_1(to_float: Callable[[Value], float] | None = None) -> Metric:
         matrix = numeric_matrix(scores, convert)
         try:
             return float(intra.icc_1_1(matrix))
+        except intra.UndefinedStatistic:
+            return float("nan")
+
+    return compute
+
+
+@metric(scores="unreduced")
+def icc_2_1(to_float: Callable[[Value], float] | None = None) -> Metric:
+    """ICC(2,1): two-way random, absolute agreement, across grader repeats.
+
+    Complements :func:`icc_1_1`. The two-way form treats the repeat index as a
+    random "rater" facet, so any systematic drift across repeat runs — e.g. a
+    batch of repeats scored during a different provider epoch — is charged
+    against agreement. That is the conservative choice for a stability claim;
+    ICC(1,1) treats repeats as fully interchangeable. Report both: the gap
+    between them is the repeat-batch drift signal (zero gap = no drift).
+
+    Returns NaN when the statistic is mathematically undefined (zero total
+    variance, or no between-item variance).
+
+    Args:
+        to_float: Optional grade-to-float mapping; defaults to Inspect's
+            :func:`value_to_float` (C/I/P -> 1.0/0.0/0.5).
+    """
+    convert = to_float or value_to_float()
+
+    def compute(scores: list[SampleScore]) -> Value:
+        matrix = np.asarray(numeric_matrix(scores, convert), dtype=float)
+        try:
+            return float(_icc(matrix, form="2,1"))
+        except intra.UndefinedStatistic:
+            return float("nan")
+
+    return compute
+
+
+@metric(scores="unreduced")
+def krippendorff_alpha_repeats(
+    level: str = "nominal",
+    categories: list[str | int | float] | None = None,
+) -> Metric:
+    """Krippendorff's alpha with the grader's repeats in the rater role.
+
+    Inspect core's ``krippendorff_alpha()`` (v0.3.258+) measures agreement
+    across **multiple judges**. This metric measures the intra-grader case:
+    repeats of one judge on frozen completions, transposed into the
+    raters-x-units layout the statistic expects. For ordinal grading scales
+    pass the full scale in order via ``categories`` and ``level='interval'``
+    (the standard practical stand-in for ordinal scales); the nominal default
+    is correct for binary C/I grading.
+
+    Returns NaN when undefined (e.g. every unit graded identically on every
+    repeat gives zero expected disagreement).
+
+    Args:
+        level: 'nominal' (default) or 'interval'.
+        categories: Full rating scale in order (required for meaningful
+            interval spacing when some categories are absent from the data).
+    """
+
+    def compute(scores: list[SampleScore]) -> Value:
+        rows = label_matrix(scores)
+        data = [[row[j] for row in rows] for j in range(len(rows[0]))]
+        try:
+            return float(_krippendorff_alpha(data, level=level, categories=categories))
         except intra.UndefinedStatistic:
             return float("nan")
 

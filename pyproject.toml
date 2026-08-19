@@ -29,6 +29,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=7", "ruff>=0.5", "mypy>=1.8"]
 demo = ["anthropic", "openai", "matplotlib>=3.7"]
+analysis = ["statsmodels>=0.14", "pandas>=2.0"]
 
 [project.urls]
 Homepage = "https://github.com/joanna-ciesielski/grader-variance"
@@ -71,7 +72,8 @@ strict = true
 files = ["src"]
 
 # rater-agreement ships no type stubs (numpy-only runtime lib); allow it untyped
-# without weakening strictness for our own code.
+# without weakening strictness for our own code. Provider SDKs and the optional
+# analysis stack are imported lazily inside functions and may be absent.
 [[tool.mypy.overrides]]
-module = ["raters.*"]
+module = ["raters.*", "anthropic.*", "openai.*", "statsmodels.*", "pandas.*"]
 ignore_missing_imports = true

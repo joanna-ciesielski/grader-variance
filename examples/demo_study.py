@@ -49,18 +49,28 @@ from inspect_ai.scorer import model_graded_fact
 from inspect_ai.solver import generate
 
 from grader_variance import (
+    RunManifest,
     compare_judges,
+    dataset_revision_for_bundled_example,
     decompose,
+    dependability,
     flip_rate,
     freeze_completions,
+    frozen_digests,
     grader_variance_share,
     grades_array,
+    icc_2_1,
     k_selection_curve,
+    krippendorff_alpha_repeats,
     regrade_frozen,
+    repeats_needed,
+    resolve_model_id,
     stopping_rule_text,
     test_retest,
     verify_frozen,
+    verify_manifest_digests,
 )
+from grader_variance.manifest import utc_now_iso, write_run_manifest
 
 PRIOR_ART = (
     "Prior art (grader self-inconsistency is established, not discovered here): "
@@ -110,12 +120,20 @@ def run_for_grader(
     k: int,
     label: str,
     single_completion: bool,
+    manifest_path: Path | None = None,
+    dependability_target: float = 0.9,
 ) -> tuple[dict[str, object], np.ndarray]:
     # The intra-grader metrics assume one frozen completion per item, so they are
     # only attached when model_epochs == 1. With multiple model completions the
     # question/model/grader split comes from grades_array + decompose below.
     metrics = (
-        [flip_rate(), test_retest(), grader_variance_share()]
+        [
+            flip_rate(),
+            test_retest(),
+            grader_variance_share(),
+            icc_2_1(),
+            krippendorff_alpha_repeats(),
+        ]
         if single_completion
         else None
     )
@@ -129,10 +147,29 @@ def run_for_grader(
     check = verify_frozen(scored)
     if not check.ok:
         raise RuntimeError(f"[{label}] frozen-completion check failed: {check}")
+    if manifest_path is not None:
+        # Cross-process byte-identity: the regraded log must carry exactly the
+        # completion digests recorded in the run manifest at freeze time.
+        verify_manifest_digests(manifest_path, scored)
 
     arr = grades_array(scored)
     comp = decompose(arr)
     curve = k_selection_curve(arr, k_max=k)
+
+    # Independent estimator cross-check (REML), when the design supports it
+    # and the optional analysis extra is installed.
+    comp_reml_dict: dict[str, float] | None = None
+    if arr.shape[1] >= 2:
+        try:
+            from grader_variance import estimate_components_reml
+
+            comp_reml_dict = estimate_components_reml(arr).as_dict()
+        except ImportError:
+            comp_reml_dict = None
+
+    # G-theory dependability view of the same planning question.
+    phi_needed = repeats_needed(comp, dependability_target)
+    dep_curve = [{"k": kk, "phi": dependability(comp, kk)} for kk in range(1, k + 1)]
 
     reported: dict[str, float] = {}
     if scored.results is not None:
@@ -149,11 +186,15 @@ def run_for_grader(
         },
         "metrics": reported,
         "decomposition": comp.as_dict(),
+        "decomposition_reml": comp_reml_dict,
         "recommended_k": curve.recommended_k,
         "grader_variance": curve.grader_variance,
         "item_variance": curve.item_variance,
         "k_curve": [{"k": p.k, "score_se": p.score_se} for p in curve.points],
         "stopping_rule": stopping_rule_text(curve),
+        "dependability_target": dependability_target,
+        "repeats_needed_for_target": phi_needed,
+        "dependability_curve": dep_curve,
     }
     return summary, arr
 
@@ -173,6 +214,21 @@ def main() -> None:
     ap.add_argument("--grader-temperature", type=float, default=1.0)
     ap.add_argument("--out", default="demo_results.json")
     ap.add_argument(
+        "--dataset-revision",
+        default=None,
+        help=(
+            "dataset revision pin recorded in the run manifest; defaults to "
+            "the SHA-256 of the bundled theory_of_mind.jsonl plus the "
+            "installed inspect_ai version"
+        ),
+    )
+    ap.add_argument(
+        "--dependability-target",
+        type=float,
+        default=0.9,
+        help="target dependability for the G-theory repeats_needed report",
+    )
+    ap.add_argument(
         "--mock",
         action="store_true",
         help="run with mock models (mechanism check, NOT a scientific result)",
@@ -188,19 +244,36 @@ def main() -> None:
             ("mock-judge-B (p=0.55)", _mock_grader(0.55, seed=2)),
         ]
         limit = args.limit
+        model_alias = "mockllm/model"
+        model_resolved = "mockllm/model"
+        grader_aliases = [label for label, _ in graders]
+        graders_resolved = ["mockllm/model"] * len(graders)
     else:
         if not args.model or not args.graders:
             ap.error("--model and --graders are required unless --mock is set")
-        model = args.model
+        # Resolve provider "-latest"/rolling aliases to the concrete snapshot
+        # each serves right now, and RUN with the resolved IDs so the study is
+        # pinned, not just documented (see manifest.resolve_model_id).
+        model_alias = args.model
+        model_resolved = resolve_model_id(args.model)
+        grader_aliases = list(args.graders)
+        graders_resolved = [resolve_model_id(g) for g in args.graders]
+        for alias, resolved in zip(
+            [model_alias, *grader_aliases],
+            [model_resolved, *graders_resolved],
+            strict=True,
+        ):
+            print(f"Resolved {alias} -> {resolved}", file=sys.stderr)
+        model = model_resolved
         graders = [
             (
-                g,
+                resolved,
                 get_model(
-                    g,
+                    resolved,
                     config=GenerateConfig(temperature=args.grader_temperature),
                 ),
             )
-            for g in args.graders
+            for resolved in graders_resolved
         ]
         limit = args.limit
 
@@ -213,6 +286,40 @@ def main() -> None:
     )
     print(f"Froze {len(frozen.samples or [])} completions.", file=sys.stderr)
 
+    # Write the run manifest at freeze time: canary, dataset revision pin,
+    # resolved model snapshots, and per-completion SHA-256 digests. Every
+    # subsequent regrade is verified against this file.
+    dataset_revision = args.dataset_revision or dataset_revision_for_bundled_example(
+        "theory_of_mind"
+    )
+    import inspect_ai as _inspect_ai
+
+    import grader_variance as _gv
+
+    manifest_path = Path(args.out).with_suffix(".manifest.json")
+    write_run_manifest(
+        manifest_path,
+        RunManifest(
+            canary=_gv.CANARY,
+            created_utc=utc_now_iso(),
+            inspect_ai_version=getattr(_inspect_ai, "__version__", "unknown"),
+            grader_variance_version=_gv.__version__,
+            dataset_name="theory_of_mind",
+            dataset_revision=dataset_revision,
+            model_alias=model_alias,
+            model_resolved=model_resolved,
+            grader_aliases=grader_aliases,
+            graders_resolved=graders_resolved,
+            k=args.k,
+            limit=limit,
+            model_epochs=args.model_epochs,
+            grader_temperature=(args.grader_temperature if not args.mock else None),
+            completion_digests=frozen_digests(frozen),
+            out_file=str(args.out),
+        ),
+    )
+    print(f"Wrote run manifest: {manifest_path}", file=sys.stderr)
+
     results = []
     arrays: list[tuple[str, np.ndarray]] = []
     for label, grader in graders:
@@ -222,6 +329,8 @@ def main() -> None:
             k=args.k,
             label=label,
             single_completion=(args.model_epochs == 1),
+            manifest_path=manifest_path,
+            dependability_target=args.dependability_target,
         )
         results.append(summary)
         arrays.append((label, arr))
@@ -248,6 +357,11 @@ def main() -> None:
         "prior_art": PRIOR_ART,
         "config": {
             "model": str(getattr(model, "name", model)),
+            "model_alias": model_alias,
+            "model_resolved": model_resolved,
+            "graders_resolved": graders_resolved,
+            "dataset_revision": dataset_revision,
+            "manifest_file": str(manifest_path),
             "k": args.k,
             "limit": limit,
             "model_epochs": args.model_epochs,
