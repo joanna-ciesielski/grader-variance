@@ -1,5 +1,7 @@
 # grader-variance
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.22030910.svg)](https://doi.org/10.5281/zenodo.22030910)
+
 An [Inspect](https://inspect.aisi.org.uk/) extension that measures **how much of a
 benchmark's score is the grader**. It isolates LLM-grader (judge) variance from
 model-sampling variance, decomposes the spread in a benchmark's headline number

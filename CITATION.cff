@@ -7,6 +7,7 @@ authors:
   - family-names: Ciesielski
     given-names: Joanna
     orcid: "https://orcid.org/0009-0001-2397-3660"
+doi: 10.5281/zenodo.22030910
 repository-code: "https://github.com/joanna-ciesielski/grader-variance"
 license: MIT
 abstract: >-
