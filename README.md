@@ -45,7 +45,7 @@ Inspect ships `krippendorff_alpha()` — but for agreement **across multiple
 judges**, and its `epochs` re-run the **model**, producing new completions. This
 extension covers the orthogonal case: **repeats of one judge on a frozen
 completion**. It adds a fixed-completion harness, intra-grader metrics (flip rate,
-ICC(1,1), test-retest, PABAK with prevalence/bias indices, grader variance share),
+ICC(1,1), test-retest, PABAK with a prevalence index, grader variance share),
 the variance decomposition, and the k-selection stopping rule. It does not
 duplicate `krippendorff_alpha()`.
 
@@ -77,13 +77,13 @@ from grader_variance import (
 )
 
 # 1. Generate completions once and freeze them (uses an EXISTING Inspect eval).
-frozen = freeze_completions(my_task, model="anthropic/claude-3-5-sonnet-latest")
+frozen = freeze_completions(my_task, model="anthropic/claude-sonnet-5")
 
 # 2. Re-grade the frozen completions k times with a judge (grader variance only).
 scored = regrade_frozen(
     frozen,
     model_graded_fact(),
-    grader="openai/gpt-4o-mini",
+    grader="openai/gpt-4.1-mini",
     k=12,
     metrics=[flip_rate(), test_retest(), grader_variance_share()],
 )
@@ -155,6 +155,25 @@ a signal that is statistically absent, which is itself the finding. The curve is
 hard-capped at `MAX_CURVE_K` points so a near-zero signal can never trigger an
 unbounded computation.
 
+### Dependability (G-theory)
+
+The same components support the generalizability-theory view: the
+dependability Phi(k) of a completion's mean grade under k grader repeats
+(Shavelson & Webb 1991), and the smallest k reaching a target.
+
+```python
+from grader_variance import dependability, repeats_needed
+
+phi_1 = dependability(comp, k=1)      # dependability of a single grade
+k_star = repeats_needed(comp, 0.9)    # smallest k with Phi(k) >= 0.9
+```
+
+In the demonstration study the two rules agree: the judge with no measurable
+re-scoring variance needs k = 1, the other needs k = 4 for Phi >= 0.9 (see
+[`docs/RESULTS.md`](docs/RESULTS.md)). An optional REML cross-check of the
+components is available via `estimate_components_reml`
+(`pip install "grader-variance[analysis]"`).
+
 ## Null results are published as-is
 
 If the grader variance term turns out to be small — the plausible outcome for a
@@ -178,11 +197,20 @@ benchmark transfers. Read it first.
 (`theory_of_mind`) with two judge families:
 
 ```bash
+pip install "grader-variance[demo] @ git+https://github.com/joanna-ciesielski/grader-variance.git"
 python examples/demo_study.py \
-  --model anthropic/claude-3-5-sonnet-latest \
-  --graders anthropic/claude-3-5-haiku-latest openai/gpt-4o-mini \
-  --k 12 --limit 50 --grader-temperature 1.0
+  --model anthropic/claude-sonnet-5 \
+  --graders anthropic/claude-haiku-4-5-20251001 openai/gpt-4.1-mini \
+  --model-epochs 3 --k 12 --limit 50 --grader-temperature 1.0
 ```
+
+These are the models and design recorded in
+[`docs/RESULTS.md`](docs/RESULTS.md) (50 questions x 3 model epochs x 12 grader
+repeats). `--model-epochs 3` matters: the model-sampling variance component is
+estimated only when more than one completion per question is frozen — with the
+default of 1 it is zero by construction, and `decompose()` returns a two-way
+question/grader split. The `[demo]` extra pulls in the provider SDKs and
+matplotlib.
 
 A `--mock` flag runs the same pipeline with deterministic mock models (no API
 keys) as a mechanism check — useful for confirming the plumbing computes, but its
