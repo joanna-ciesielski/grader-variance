@@ -10,7 +10,7 @@ contribution to the *benchmark score's* SE; dependability bounds the grader's
 noise share in a *single completion's* mean grade — and the demo study reports
 both.
 
-Honesty note (state this in the paper): under the nested design
+Honesty note: under the nested design
 ``(item, model-sample, grader-repeat)`` with a single grader whose repeats are
 exchangeable, the grader component IS the within-cell residual. There is no
 separable fourth "residual" component; ``sigma2_grader`` and the residual are

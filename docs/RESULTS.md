@@ -62,7 +62,8 @@ Two judges, same benchmark, same frozen completions: one has **zero**
 measurable re-scoring variance (k = 1 suffices), the other's re-scoring noise
 is **28.6% of grade variance** (k = 4 required for Φ ≥ 0.9). Published setups
 report still other values — 11–15 repeats (Coin Flip Judge, arXiv 2606.13685)
-and 44% judge-share (Messing, arXiv 2604.11581). Required grader repeats are
+and a 43.8% judge-panel share of estimator variance (Messing,
+arXiv 2604.11581, section 4.1 / Fig. 3a). Required grader repeats are
 an **empirical property of the (benchmark, judge) pair**, spanning an order of
 magnitude across setups; the only way to know yours is to measure it, and this
 harness makes that a one-line check.
@@ -82,7 +83,7 @@ harness makes that a one-line check.
    (question / model-sample / grader-repeat) with a single grader whose
    repeats are exchangeable, the grader component and the residual are the
    same term by construction; there is no separable fourth component. Stated
-   in `grader_variance/dstudy.py` and in the paper.
+   in `grader_variance/dstudy.py`.
 3. The 0.38 flip rate from earlier project notes is a seeded synthetic
    fixture (no model calls) and appears nowhere in these results.
 4. Grader-share depends on the judge-induced grade distribution, so the
